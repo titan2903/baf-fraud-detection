@@ -1,0 +1,9 @@
+data/
+.venv/
+.ipynb_checkpoints/
+__pycache__/
+tasks/
+brief.md
+.claude/
+.DS_Store
+*.log
