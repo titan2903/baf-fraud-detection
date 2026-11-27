@@ -52,7 +52,6 @@ jobs:
       - uses: appleboy/ssh-action@v1.2.0
         env:
           IMAGE: ${{ needs.build.outputs.image }}:${{ github.sha }}
-          API_KEY: ${{ secrets.API_KEY }}
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -60,14 +59,16 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
-          envs: IMAGE,API_KEY,GHCR_USER,GHCR_TOKEN
+          envs: IMAGE,GHCR_USER,GHCR_TOKEN
           script: |
             set -e
+            ENV_FILE=/home/ubuntu/baf-fraud-detection/.env
+            [ -f "$ENV_FILE" ] || { echo "$ENV_FILE tidak ada (isi: API_KEY=...)"; exit 1; }
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             docker pull "$IMAGE"
             docker rm -f fraud-api 2>/dev/null || true
             docker run -d --name fraud-api --restart unless-stopped \
-              -p 8000:8000 -e API_KEY="$API_KEY" "$IMAGE"
+              -p 8000:8000 --env-file "$ENV_FILE" "$IMAGE"
             docker logout ghcr.io
             for i in $(seq 30); do
               curl -fs -o /dev/null http://localhost:8000/openapi.json && echo "deploy OK: $IMAGE" && exit 0
