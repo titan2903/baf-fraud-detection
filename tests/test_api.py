@@ -77,8 +77,10 @@ def test_committed_openapi_is_current():
     import json
     import pathlib
 
+    from scripts.export_openapi import build
+
     committed = json.loads((pathlib.Path(__file__).resolve().parent.parent / "openapi.json").read_text())
-    assert committed == app.openapi()
+    assert committed == build()
 
 
 def test_non_ascii_key_is_401(legit_row):
@@ -90,3 +92,37 @@ def test_nan_value_is_422(legit_row):
     body = __import__("json").dumps(legit_row).replace('"income": 0.1', '"income": NaN')
     r = client.post("/predict", content=body, headers={"x-api-key": KEY, "Content-Type": "application/json"})
     assert r.status_code == 422
+
+
+def test_health_without_key():
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json() == {"status": "ok", "model_name": "fraud-lgbm", "model_version": model.MODEL_VERSION}
+
+
+def test_root_shows_health():
+    r = client.get("/")
+    assert r.status_code == 200
+    assert r.json() == client.get("/health").json()
+
+
+def test_health_in_swagger():
+    assert "get" in app.openapi()["paths"]["/health"]
+
+
+def test_openapi_lists_servers_for_postman():
+    from scripts.export_openapi import build
+
+    assert [s["url"] for s in build()["servers"]] == ["https://fraudguard.yudista.tech", "http://localhost:8000"]
+
+
+def test_swagger_calls_its_own_host():
+    # tanpa servers di app, Swagger memanggil host yang sedang dibuka (tidak kena CORS)
+    assert "servers" not in app.openapi()
+
+
+@pytest.mark.parametrize("path", ["/", "/health"])
+def test_health_supports_head_for_uptime_monitors(path):
+    r = client.head(path)
+    assert r.status_code == 200
+    assert r.content == b""

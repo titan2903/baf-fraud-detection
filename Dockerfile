@@ -17,7 +17,7 @@ USER appuser
 ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/openapi.json')" || exit 1
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
 
-# API_KEY diberikan saat docker run (-e API_KEY=...), tidak disimpan di image
+# API_KEY diberikan saat docker run (--env-file .env berisi API_KEY=...), tidak disimpan di image
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

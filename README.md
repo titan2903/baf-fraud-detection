@@ -36,15 +36,15 @@ jupyter nbconvert --to notebook --execute notebook.ipynb
 
 ## API
 
-`POST /predict` menerima satu pengajuan (29 fitur, semua wajib, kirim -1 untuk data yang tidak ada) dan butuh header `x-api-key`. Contoh body ada di Swagger `http://localhost:8000/docs` (tombol Authorize lalu Try it out). Skema OpenAPI ada di `openapi.json` dan bisa di-import ke Postman.
+`GET /health` (juga `/`) mengembalikan status layanan tanpa key. `POST /predict` menerima satu pengajuan (29 fitur, semua wajib, kirim -1 untuk data yang tidak ada) dan butuh header `x-api-key`. Contoh body ada di Swagger `http://localhost:8000/docs` (tombol Authorize lalu Try it out). Skema OpenAPI ada di `openapi.json` dan bisa di-import ke Postman.
 
 ```bash
 uvicorn app.main:app --port 8000 --env-file .env   # .env berisi API_KEY=<kunci>
 curl -X POST localhost:8000/predict -H "x-api-key: <kunci>" -H "Content-Type: application/json" -d @pengajuan.json
 # {"model_name":"fraud-lgbm","model_version":"987ca8b198b2","fraud_score":0.00047,"is_fraud":false,"threshold":0.05603}
-python -m pytest   # test; perbarui skema: python -c "import json; from app.main import app; print(json.dumps(app.openapi(), indent=2))" > openapi.json
+python -m pytest   # test; perbarui skema: python -m scripts.export_openapi
 ```
 
 ## Deploy (Docker + GitHub Actions)
 
-Setiap push ke `main`, `.github/workflows/deploy.yml` menjalankan test, build image ke `ghcr.io/<owner>/<repo>`, lalu SSH ke VPS dan menjalankan container `fraud-api` di port 8029 (ubah lewat repo variable `APP_PORT`). VPS cukup terpasang Docker. Secrets repo yang dibutuhkan: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` (private key), dan opsional `VPS_PORT`. Kunci API dibaca dari `/home/ubuntu/baf-fraud-detection/.env` di VPS (isi: `API_KEY=...`). Jalankan lokal: `docker build -t fraud-api . && docker run -p 8000:8000 --env-file .env fraud-api`.
+Setiap push ke `main`, `.github/workflows/deploy.yml` menjalankan test, build image ke `ghcr.io/<owner>/<repo>`, lalu SSH ke VPS dan menjalankan container `fraud-api` di `127.0.0.1:8029` (hanya untuk reverse proxy di VPS; ubah port lewat repo variable `APP_PORT`). VPS cukup terpasang Docker. Secrets repo yang dibutuhkan: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` (private key), dan opsional `VPS_PORT`. Kunci API dibaca dari `/home/ubuntu/baf-fraud-detection/.env` di VPS (isi: `API_KEY=...`). Jalankan lokal: `docker build -t fraud-api . && docker run -p 8000:8000 --env-file .env fraud-api`.

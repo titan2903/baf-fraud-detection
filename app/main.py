@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyHeader
 
 from app import model
-from app.schemas import Application, Prediction
+from app.schemas import Application, Health, Prediction
 
 app = FastAPI(
     title="BAF Fraud Detection API",
@@ -32,6 +32,14 @@ def require_api_key(key: str | None = Security(api_key_header)) -> None:
         raise HTTPException(500, "API key belum dikonfigurasi di server")
     if key is None or not secrets.compare_digest(key.encode(), expected.encode()):
         raise HTTPException(401, "x-api-key tidak valid")
+
+
+@app.get("/health", response_model=Health)
+@app.api_route("/health", methods=["HEAD"], include_in_schema=False)  # uptime monitor sering pakai HEAD
+@app.api_route("/", methods=["GET", "HEAD"], response_model=Health, include_in_schema=False)
+def health() -> dict:
+    """Status layanan dan versi model yang sedang dimuat (tanpa x-api-key)."""
+    return {"status": "ok", "model_name": model.MODEL_NAME, "model_version": model.MODEL_VERSION}
 
 
 @app.post("/predict", response_model=Prediction, dependencies=[Depends(require_api_key)])

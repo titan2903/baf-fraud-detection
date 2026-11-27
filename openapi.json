@@ -5,7 +5,36 @@
     "description": "Skor peluang penipuan untuk pengajuan buka rekening (LightGBM, data BAF). Kirim header `x-api-key`.",
     "version": "0.1.0"
   },
+  "servers": [
+    {
+      "url": "https://fraudguard.yudista.tech",
+      "description": "Production"
+    },
+    {
+      "url": "http://localhost:8000",
+      "description": "Lokal"
+    }
+  ],
   "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "description": "Status layanan dan versi model yang sedang dimuat (tanpa x-api-key).",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/predict": {
       "post": {
         "summary": "Predict",
@@ -299,6 +328,29 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "Health": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "model_name",
+          "model_version"
+        ],
+        "title": "Health"
       },
       "Prediction": {
         "properties": {

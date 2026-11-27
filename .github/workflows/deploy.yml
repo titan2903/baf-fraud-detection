@@ -69,10 +69,10 @@ jobs:
             docker pull "$IMAGE"
             docker rm -f fraud-api 2>/dev/null || true
             docker run -d --name fraud-api --restart unless-stopped \
-              -p "$APP_PORT:8000" --env-file "$ENV_FILE" "$IMAGE"
+              -p "127.0.0.1:$APP_PORT:8000" --env-file "$ENV_FILE" "$IMAGE"
             docker logout ghcr.io
             for i in $(seq 30); do
-              curl -fs -o /dev/null "http://localhost:$APP_PORT/openapi.json" && echo "deploy OK: $IMAGE" && exit 0
+              curl -fs -o /dev/null "http://localhost:$APP_PORT/health" && echo "deploy OK: $IMAGE" && exit 0
               sleep 2
             done
             docker logs --tail 50 fraud-api

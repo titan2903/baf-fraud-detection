@@ -43,6 +43,14 @@ class Application(BaseModel):
     device_distinct_emails_8w: int
 
 
+class Health(BaseModel):
+    model_config = {"protected_namespaces": ()}
+
+    status: str
+    model_name: str
+    model_version: str
+
+
 class Prediction(BaseModel):
     model_config = {"protected_namespaces": ()}  # izinkan field berawalan model_
 
