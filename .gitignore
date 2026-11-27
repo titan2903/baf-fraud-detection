@@ -8,3 +8,4 @@ brief.md
 .DS_Store
 *.log
 docs/
+.env
