@@ -47,4 +47,4 @@ python -m pytest   # test; perbarui skema: python -c "import json; from app.main
 
 ## Deploy (Docker + GitHub Actions)
 
-Setiap push ke `main`, `.github/workflows/deploy.yml` menjalankan test, build image ke `ghcr.io/<owner>/<repo>`, lalu SSH ke VPS dan menjalankan container `fraud-api` di port 8000. VPS cukup terpasang Docker. Secrets repo yang dibutuhkan: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` (private key), dan opsional `VPS_PORT`. Kunci API dibaca dari `/home/ubuntu/baf-fraud-detection/.env` di VPS (isi: `API_KEY=...`). Jalankan lokal: `docker build -t fraud-api . && docker run -p 8000:8000 --env-file .env fraud-api`.
+Setiap push ke `main`, `.github/workflows/deploy.yml` menjalankan test, build image ke `ghcr.io/<owner>/<repo>`, lalu SSH ke VPS dan menjalankan container `fraud-api` di port 8029 (ubah lewat repo variable `APP_PORT`). VPS cukup terpasang Docker. Secrets repo yang dibutuhkan: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` (private key), dan opsional `VPS_PORT`. Kunci API dibaca dari `/home/ubuntu/baf-fraud-detection/.env` di VPS (isi: `API_KEY=...`). Jalankan lokal: `docker build -t fraud-api . && docker run -p 8000:8000 --env-file .env fraud-api`.
