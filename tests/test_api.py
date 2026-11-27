@@ -77,7 +77,7 @@ def test_committed_openapi_is_current():
     import json
     import pathlib
 
-    committed = json.loads(pathlib.Path("openapi.json").read_text())
+    committed = json.loads((pathlib.Path(__file__).resolve().parent.parent / "openapi.json").read_text())
     assert committed == app.openapi()
 
 
