@@ -1,0 +1,385 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "BAF Fraud Detection API",
+    "description": "Skor peluang penipuan untuk pengajuan buka rekening (LightGBM, data BAF). Kirim header `x-api-key`.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/predict": {
+      "post": {
+        "summary": "Predict",
+        "operationId": "predict_predict_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Application"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Prediction"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Application": {
+        "properties": {
+          "income": {
+            "type": "number",
+            "title": "Income"
+          },
+          "name_email_similarity": {
+            "type": "number",
+            "title": "Name Email Similarity"
+          },
+          "prev_address_months_count": {
+            "type": "integer",
+            "title": "Prev Address Months Count"
+          },
+          "current_address_months_count": {
+            "type": "integer",
+            "title": "Current Address Months Count"
+          },
+          "customer_age": {
+            "type": "integer",
+            "title": "Customer Age"
+          },
+          "days_since_request": {
+            "type": "number",
+            "title": "Days Since Request"
+          },
+          "intended_balcon_amount": {
+            "type": "number",
+            "title": "Intended Balcon Amount"
+          },
+          "payment_type": {
+            "type": "string",
+            "enum": [
+              "AA",
+              "AB",
+              "AC",
+              "AD",
+              "AE"
+            ],
+            "title": "Payment Type"
+          },
+          "zip_count_4w": {
+            "type": "integer",
+            "title": "Zip Count 4W"
+          },
+          "velocity_6h": {
+            "type": "number",
+            "title": "Velocity 6H"
+          },
+          "velocity_24h": {
+            "type": "number",
+            "title": "Velocity 24H"
+          },
+          "velocity_4w": {
+            "type": "number",
+            "title": "Velocity 4W"
+          },
+          "bank_branch_count_8w": {
+            "type": "integer",
+            "title": "Bank Branch Count 8W"
+          },
+          "date_of_birth_distinct_emails_4w": {
+            "type": "integer",
+            "title": "Date Of Birth Distinct Emails 4W"
+          },
+          "employment_status": {
+            "type": "string",
+            "enum": [
+              "CA",
+              "CB",
+              "CC",
+              "CD",
+              "CE",
+              "CF",
+              "CG"
+            ],
+            "title": "Employment Status"
+          },
+          "credit_risk_score": {
+            "type": "integer",
+            "title": "Credit Risk Score"
+          },
+          "email_is_free": {
+            "type": "integer",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Email Is Free"
+          },
+          "housing_status": {
+            "type": "string",
+            "enum": [
+              "BA",
+              "BB",
+              "BC",
+              "BD",
+              "BE",
+              "BF",
+              "BG"
+            ],
+            "title": "Housing Status"
+          },
+          "phone_home_valid": {
+            "type": "integer",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Phone Home Valid"
+          },
+          "phone_mobile_valid": {
+            "type": "integer",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Phone Mobile Valid"
+          },
+          "bank_months_count": {
+            "type": "integer",
+            "title": "Bank Months Count"
+          },
+          "has_other_cards": {
+            "type": "integer",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Has Other Cards"
+          },
+          "proposed_credit_limit": {
+            "type": "number",
+            "title": "Proposed Credit Limit"
+          },
+          "foreign_request": {
+            "type": "integer",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Foreign Request"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "INTERNET",
+              "TELEAPP"
+            ],
+            "title": "Source"
+          },
+          "session_length_in_minutes": {
+            "type": "number",
+            "title": "Session Length In Minutes"
+          },
+          "device_os": {
+            "type": "string",
+            "enum": [
+              "linux",
+              "macintosh",
+              "other",
+              "windows",
+              "x11"
+            ],
+            "title": "Device Os"
+          },
+          "keep_alive_session": {
+            "type": "integer",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Keep Alive Session"
+          },
+          "device_distinct_emails_8w": {
+            "type": "integer",
+            "title": "Device Distinct Emails 8W"
+          }
+        },
+        "type": "object",
+        "required": [
+          "income",
+          "name_email_similarity",
+          "prev_address_months_count",
+          "current_address_months_count",
+          "customer_age",
+          "days_since_request",
+          "intended_balcon_amount",
+          "payment_type",
+          "zip_count_4w",
+          "velocity_6h",
+          "velocity_24h",
+          "velocity_4w",
+          "bank_branch_count_8w",
+          "date_of_birth_distinct_emails_4w",
+          "employment_status",
+          "credit_risk_score",
+          "email_is_free",
+          "housing_status",
+          "phone_home_valid",
+          "phone_mobile_valid",
+          "bank_months_count",
+          "has_other_cards",
+          "proposed_credit_limit",
+          "foreign_request",
+          "source",
+          "session_length_in_minutes",
+          "device_os",
+          "keep_alive_session",
+          "device_distinct_emails_8w"
+        ],
+        "title": "Application",
+        "description": "Satu pengajuan pembukaan rekening (29 fitur, urutan sama dengan model).",
+        "examples": [
+          {
+            "bank_branch_count_8w": 35,
+            "bank_months_count": 1,
+            "credit_risk_score": 82,
+            "current_address_months_count": 3,
+            "customer_age": 40,
+            "date_of_birth_distinct_emails_4w": 4,
+            "days_since_request": 0.0301686999891298,
+            "device_distinct_emails_8w": 1,
+            "device_os": "linux",
+            "email_is_free": 1,
+            "employment_status": "CA",
+            "foreign_request": 1,
+            "has_other_cards": 1,
+            "housing_status": "BB",
+            "income": 0.1,
+            "intended_balcon_amount": -1.2123557602962909,
+            "keep_alive_session": 1,
+            "name_email_similarity": 0.7928278491100123,
+            "payment_type": "AB",
+            "phone_home_valid": 1,
+            "phone_mobile_valid": 0,
+            "prev_address_months_count": -1,
+            "proposed_credit_limit": 200.0,
+            "session_length_in_minutes": 2.726813455836169,
+            "source": "INTERNET",
+            "velocity_24h": 3347.0249222680395,
+            "velocity_4w": 4650.407172875624,
+            "velocity_6h": 4165.8648375101975,
+            "zip_count_4w": 907
+          }
+        ]
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Prediction": {
+        "properties": {
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "fraud_score": {
+            "type": "number",
+            "title": "Fraud Score"
+          },
+          "is_fraud": {
+            "type": "boolean",
+            "title": "Is Fraud"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_name",
+          "model_version",
+          "fraud_score",
+          "is_fraud",
+          "threshold"
+        ],
+        "title": "Prediction"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "APIKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    }
+  }
+}

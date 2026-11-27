@@ -33,3 +33,14 @@ Python 3.12, jalankan dari folder root repo. Data diunduh otomatis lewat `kaggle
 pip install -r requirements.txt
 jupyter nbconvert --to notebook --execute notebook.ipynb
 ```
+
+## API
+
+`POST /predict` menerima satu pengajuan (29 fitur, semua wajib, kirim -1 untuk data yang tidak ada) dan butuh header `x-api-key`. Contoh body ada di Swagger `http://localhost:8000/docs` (tombol Authorize lalu Try it out). Skema OpenAPI ada di `docs/openapi.json` dan bisa di-import ke Postman.
+
+```bash
+API_KEY=<kunci> uvicorn app.main:app --port 8000
+curl -X POST localhost:8000/predict -H "x-api-key: <kunci>" -H "Content-Type: application/json" -d @pengajuan.json
+# {"model_name":"fraud-lgbm","model_version":"987ca8b198b2","fraud_score":0.00047,"is_fraud":false,"threshold":0.05603}
+python -m pytest   # test; perbarui skema: python -c "import json; from app.main import app; print(json.dumps(app.openapi(), indent=2))" > docs/openapi.json
+```
