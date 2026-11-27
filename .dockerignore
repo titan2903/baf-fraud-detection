@@ -1,0 +1,15 @@
+.git
+.github
+.venv
+.env
+data
+tasks
+tests
+docs
+.superpowers
+.ruff_cache
+.claude
+notebook.ipynb
+models/lgbm_fraud.txt
+*.pdf
+**/__pycache__

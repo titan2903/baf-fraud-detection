@@ -33,3 +33,18 @@ Python 3.12, jalankan dari folder root repo. Data diunduh otomatis lewat `kaggle
 pip install -r requirements.txt
 jupyter nbconvert --to notebook --execute notebook.ipynb
 ```
+
+## API
+
+`POST /predict` menerima satu pengajuan (29 fitur, semua wajib, kirim -1 untuk data yang tidak ada) dan butuh header `x-api-key`. Contoh body ada di Swagger `http://localhost:8000/docs` (tombol Authorize lalu Try it out). Skema OpenAPI ada di `openapi.json` dan bisa di-import ke Postman.
+
+```bash
+uvicorn app.main:app --port 8000 --env-file .env   # .env berisi API_KEY=<kunci>
+curl -X POST localhost:8000/predict -H "x-api-key: <kunci>" -H "Content-Type: application/json" -d @pengajuan.json
+# {"model_name":"fraud-lgbm","model_version":"987ca8b198b2","fraud_score":0.00047,"is_fraud":false,"threshold":0.05603}
+python -m pytest   # test; perbarui skema: python -c "import json; from app.main import app; print(json.dumps(app.openapi(), indent=2))" > openapi.json
+```
+
+## Deploy (Docker + GitHub Actions)
+
+Setiap push ke `main`, `.github/workflows/deploy.yml` menjalankan test, build image ke `ghcr.io/<owner>/<repo>`, lalu SSH ke VPS dan menjalankan container `fraud-api` di port 8000. VPS cukup terpasang Docker. Secrets repo yang dibutuhkan: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` (private key), `API_KEY`, dan opsional `VPS_PORT`. Jalankan lokal: `docker build -t fraud-api . && docker run -p 8000:8000 --env-file .env fraud-api`.
